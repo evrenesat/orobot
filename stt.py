@@ -35,14 +35,24 @@ config = {
 class Voximp(object):
     dial = None
     def __init__(self):
+#        print sys.argv
+        pipeline,self.filename=self.convertToWav(sys.argv[1])
+        pipeline.set_state(gst.STATE_PLAYING)
         self.init_gst()
         self.pipeline.set_state(gst.STATE_PLAYING)
 
+
     def init_gst(self):
 #        self.pipeline = gst.parse_launch('alsasrc ! audioconvert ! audioresample '
-        self.pipeline = gst.parse_launch('filesrc location=calendar.mp3 ! decodebin ! audioresample '
-                                         + '! vader name=vad auto-threshold=true '
-                                         + '! pocketsphinx name=asr ! fakesink ')
+        self.pipeline = gst.parse_launch(
+                'filesrc name=input ! decodebin ! audioconvert '
+              + '! audioresample '
+              + '! vader name=vad auto-threshold=true '
+              + '! pocketsphinx name=asr ! appsink sync=false name=appsink')
+
+        src = self.pipeline.get_by_name("input")
+        print self.filename
+        src.set_property("location", self.filename)
         asr = self.pipeline.get_by_name('asr')
         asr.connect('partial_result', self.asr_partial_result)
         asr.connect('result', self.asr_result)
@@ -55,6 +65,28 @@ class Voximp(object):
         bus.connect('message::application', self.application_message)
 
         self.pipeline.set_state(gst.STATE_PAUSED)
+        
+    def convertToWav(self, filename):
+        """Return (pipeline, destination_file_name) to convert filename to .wav
+        Caller must start the pipeline. If filename is already .wav, return
+        (None, filename).
+
+        gstreamer cannot always seek MP3 depending on the installed
+        plugins.  Probably using .wav for our many gnlfilesource also
+        reduces overhead in the final gnonlin step. (needs mp3parse from
+        -ugly to seek mp3)"""
+
+        destination = os.path.extsep.join((os.path.splitext(filename)[0], "wav"))
+        if os.path.exists(destination) and os.path.samefile(filename, destination):
+            return (None, destination)
+        else:
+            pipeline = gst.parse_launch("filesrc name=mp3src ! decodebin ! audioconvert ! wavenc ! filesink name=wavsink")
+            source = pipeline.get_by_name("mp3src")
+            sink = pipeline.get_by_name("wavsink")
+            source.set_property("location", filename)
+            sink.set_property("location", destination)
+            pipeline.set_state(gst.STATE_PLAYING)
+            return (pipeline, destination)
 
     def asr_partial_result(self, asr, text, uttid):
         struct = gst.Structure('partial_result')
