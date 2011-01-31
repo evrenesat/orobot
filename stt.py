@@ -36,29 +36,30 @@ class Voximp(object):
     dial = None
     def __init__(self):
 #        print sys.argv
-        pipeline,self.filename=self.convertToWav(sys.argv[1])
-        pipeline.set_state(gst.STATE_PLAYING)
+#        pipeline,self.filename=self.convertToWav(sys.argv[1])
+#        pipeline.set_state(gst.STATE_PLAYING)
         self.init_gst()
         self.pipeline.set_state(gst.STATE_PLAYING)
 
 
     def init_gst(self):
-#        self.pipeline = gst.parse_launch('alsasrc ! audioconvert ! audioresample '
-        self.pipeline = gst.parse_launch(
-                'filesrc name=input ! decodebin ! audioconvert '
-              + '! audioresample '
+        self.pipeline = gst.parse_launch('pulsesrc ! audioconvert ! audioresample '
+#        self.pipeline = gst.parse_launch(
+#                'filesrc name=input ! decodebin ! audioconvert '
+#              + '! audioresample '
               + '! vader name=vad auto-threshold=true '
               + '! pocketsphinx name=asr ! appsink sync=false name=appsink')
 
-        src = self.pipeline.get_by_name("input")
-        print self.filename
-        src.set_property("location", self.filename)
+#        src = self.pipeline.get_by_name("input")
+#        print self.filename
+#        src.set_property("location", self.filename)
         asr = self.pipeline.get_by_name('asr')
         asr.connect('partial_result', self.asr_partial_result)
         asr.connect('result', self.asr_result)
         asr.set_property('lm', config['lm'])
         asr.set_property('dict', config['dict'])
         asr.set_property('configured', True)
+        self.asr=asr
 
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
@@ -114,7 +115,24 @@ class Voximp(object):
 
     def final_result(self, hyp, uttid):
         print "final: %s" % hyp
-
+        if hyp=='CALENDAR':
+#            self.asr.set_property('configured', False)
+            self.asr.set_property('lm', config['lm'])
+            self.asr.set_property('dict', config['dict'])
+            self.asr.connect('partial_result', self.asr_partial_result)
+            self.asr.connect('result', self.asr_result)
+#            self.pipeline.set_state(gst.STATE_PAUSED)
+#            self.asr.set_property('configured', True)
+#            self.pipeline.set_state(gst.STATE_PLAYING)
+        elif hyp in ['MAIN','BACK']:
+#            self.asr.set_property('configured', False)
+            self.asr.connect('partial_result', self.asr_partial_result)
+            self.asr.connect('result', self.asr_result)                        
+            self.asr.set_property('dict', '2.dic')
+            self.asr.set_property('lm', '2.lm')
+#            self.pipeline.set_state(gst.STATE_PAUSED)
+#            self.asr.set_property('configured', True)
+#            self.pipeline.set_state(gst.STATE_PLAYING)
 
 versionNumber = '0.0.1'
 
