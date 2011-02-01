@@ -1,4 +1,4 @@
-Language model created by QuickLM on Sun Jan 30 17:34:43 EST 2011
+Language model created by QuickLM on Mon Jan 31 17:47:53 EST 2011
 Copyright (c) 1996-2010 Carnegie Mellon University and Alexander I. Rudnicky
 
 The model is in standard ARPA format, designed by Doug Paul while he was at MITRE.
@@ -7,55 +7,74 @@ The code that was used to produce this language model is available in Open Sourc
 Please visit http://www.speech.cs.cmu.edu/tools/ for more information
 
 The (fixed) discount mass is 0.5. The backoffs are computed using the ratio method.
-This model based on a corpus of 9 sentences and 11 words
+This model based on a corpus of 13 sentences and 16 words
 
 \data\
-ngram 1=11
-ngram 2=18
-ngram 3=9
+ngram 1=16
+ngram 2=27
+ngram 3=14
 
 \1-grams:
--0.7782 </s> -0.3010
--0.7782 <s> -0.2218
--1.7324 ALARM -0.2218
--1.7324 CALENDAR -0.2218
--1.7324 ENTRY -0.2218
--1.7324 MUSIC -0.2218
--1.7324 NEW -0.2218
--1.7324 NOTE -0.2218
--1.7324 PHONE -0.2218
--1.7324 TODO -0.2218
--1.7324 TWEET -0.2218
+-0.7891 </s> -0.3010
+-0.7891 <s> -0.2240
+-1.9031 ALARM -0.2240
+-1.9031 CALENDAR -0.2240
+-1.9031 CAMERA -0.2240
+-1.9031 COMPUTER -0.2240
+-1.9031 DO -0.2240
+-1.9031 ENTRY -0.2240
+-1.9031 INTERNET -0.2240
+-1.9031 MUSIC -0.2240
+-1.9031 NEW -0.2240
+-1.9031 NOTE -0.2240
+-1.9031 PHONE -0.2240
+-1.9031 RECORD -0.2240
+-1.9031 TO -0.2956
+-1.9031 TWEET -0.2240
 
 \2-grams:
--1.2553 <s> ALARM 0.0000
--1.2553 <s> CALENDAR 0.0000
--1.2553 <s> ENTRY 0.0000
--1.2553 <s> MUSIC 0.0000
--1.2553 <s> NEW 0.0000
--1.2553 <s> NOTE 0.0000
--1.2553 <s> PHONE 0.0000
--1.2553 <s> TODO 0.0000
--1.2553 <s> TWEET 0.0000
+-1.4150 <s> ALARM 0.0000
+-1.4150 <s> CALENDAR 0.0000
+-1.4150 <s> CAMERA 0.0000
+-1.4150 <s> COMPUTER 0.0000
+-1.4150 <s> ENTRY 0.0000
+-1.4150 <s> INTERNET 0.0000
+-1.4150 <s> MUSIC 0.0000
+-1.4150 <s> NEW 0.0000
+-1.4150 <s> NOTE 0.0000
+-1.4150 <s> PHONE 0.0000
+-1.4150 <s> RECORD 0.0000
+-1.4150 <s> TO 0.0000
+-1.4150 <s> TWEET 0.0000
 -0.3010 ALARM </s> -0.3010
 -0.3010 CALENDAR </s> -0.3010
+-0.3010 CAMERA </s> -0.3010
+-0.3010 COMPUTER </s> -0.3010
+-0.3010 DO </s> -0.3010
 -0.3010 ENTRY </s> -0.3010
+-0.3010 INTERNET </s> -0.3010
 -0.3010 MUSIC </s> -0.3010
 -0.3010 NEW </s> -0.3010
 -0.3010 NOTE </s> -0.3010
 -0.3010 PHONE </s> -0.3010
--0.3010 TODO </s> -0.3010
+-0.3010 RECORD </s> -0.3010
+-0.3010 TO DO 0.0000
 -0.3010 TWEET </s> -0.3010
 
 \3-grams:
 -0.3010 <s> ALARM </s>
 -0.3010 <s> CALENDAR </s>
+-0.3010 <s> CAMERA </s>
+-0.3010 <s> COMPUTER </s>
 -0.3010 <s> ENTRY </s>
+-0.3010 <s> INTERNET </s>
 -0.3010 <s> MUSIC </s>
 -0.3010 <s> NEW </s>
 -0.3010 <s> NOTE </s>
 -0.3010 <s> PHONE </s>
--0.3010 <s> TODO </s>
+-0.3010 <s> RECORD </s>
+-0.3010 <s> TO DO
 -0.3010 <s> TWEET </s>
+-0.3010 TO DO </s>
 
 \end\
