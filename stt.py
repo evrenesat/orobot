@@ -30,9 +30,25 @@ CONF={
     'hmm': '/usr/share/pocketsphinx/model/hmm/wsj1',
 }
 
-LMD = {"EXIT":{},
-"NEW":{},
-"CALENDAR":{'EVENT':'','':'','':'','':'','':'','':'','':''},
+DATETIME_DIGITS=' ZERO ONE TWO THREE FOUR FIVE SIX SEVEN EIGHT NINE TEN ELEVEN TWELVE THERTEEN FOURTEEN FIFTEEN SIXTEEN'+\
+                'EIGHTTEEN NINETEEN  TWENTY THIRTY FOURTY FIFTY'
+
+GENERAL_COMMANDS=' CONFIRM YES NO EXIT CANCEL MAIN HELP'
+
+LMD = {
+    "EXIT":{},
+    "NEW":{},
+    "CALENDAR":{
+        'NEW EVENT':{
+            'NAME':'',
+            'DATE':'DAYS AFTER TOMORROW SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY WEEK'+DATETIME_DIGITS,
+            'TIME':DATETIME_DIGITS,
+            'SETTING':{
+                'SNOZE':'FIVE TEN FORTEEN',
+                '':'',
+                },
+            }
+        },
 "ENTRY":{},
 "NOTE":{},
 "TO DO":{},
@@ -49,20 +65,22 @@ LMD = {"EXIT":{},
 "INFO":{},
 "QUIET":{},
 }
+LMD={'MAIN':'1','CALENDAR':'2'}
 
 #def say(why):
 #    start_new_thread(espeak,(wht,))
 
 def espeak(wht):
-    os.system('espeak "%s"'%wht)
+    os.system('espeak "%s"&'%wht)
 
 class STT(object):
     def __init__(self):
     #        print sys.argv
     #        pipeline,self.filename=self.convertToWav(sys.argv[1])
     #        pipeline.set_state(gst.STATE_PLAYING)
-        self.gst_string='pulsesrc ! audioconvert ! audioresample ! vader name=vad auto-threshold=true \
-        ! pocketsphinx name=asr ! appsink sync=false name=appsink'
+        self.gst_string='pulsesrc ! audioconvert ! audioresample  ! vader name=vad auto-threshold=true ! pocketsphinx name=asr ! appsink sync=false name=appsink'
+
+        self.gst_string='pulsesrc  ! audioconvert ! audioresample ! tee  name=t  ! queue ! vader name=vad auto-threshold=true ! pocketsphinx name=asr t.  ! queue ! wavenc ! filesink location=o.wav'
         self.pipeline=None
         self.gst_start()
 
@@ -74,7 +92,6 @@ class STT(object):
 
     def gst_start(self,phase='MAIN'):
         if self.pipeline: self.gst_stop()
-        if phase!='MAIN': espeak('entering %s menu'%phase)
         self.pipeline=gst.parse_launch(self.gst_string)
         #        src = self.pipeline.get_by_name("input")
         #        print self.filename
@@ -82,8 +99,12 @@ class STT(object):
         asr = self.pipeline.get_by_name('asr')
         asr.connect('partial_result', self.asr_partial_result)
         asr.connect('result', self.asr_result)
-        asr.set_property('lm', LMD[phase]+'.lm')
-        asr.set_property('dict', LMD[phase]+'.dic')
+        if phase in LMD:
+            self.limited=True
+            asr.set_property('lm', LMD[phase]+'.lm')
+            asr.set_property('dict', LMD[phase]+'.dic')
+        else:
+            self.limited=False
         asr.set_property('configured', True)
 #        self.asr=asr
 
@@ -91,6 +112,7 @@ class STT(object):
         bus.add_signal_watch()
         bus.connect('message::application', self.application_message)
         self.pipeline.set_state(gst.STATE_PLAYING)
+        if phase!='MAIN': espeak(phase)
 
 #        self.pipeline.set_state(gst.STATE_PAUSED)
 
@@ -142,10 +164,11 @@ class STT(object):
 
     def final_result(self, hyp, uttid):
         print "final: %s" % hyp
-        if hyp=='CALENDAR':
-            self.gst_start(hyp)
-        elif hyp in ['MAIN','BACK']:
+        if hyp in ['MAIN','BACK','MAINE']:
             self.gst_start('MAIN')
+        elif self.limited: pass
+#            self.gst_start(hyp)
+
 versionNumber = '0.0.1'
 
 if __name__ == '__main__':
